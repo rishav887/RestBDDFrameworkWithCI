@@ -3,6 +3,8 @@ package stepDefinations;
 import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,28 +22,25 @@ import io.restassured.specification.ResponseSpecification;
 import pojo.AddPlace;
 import pojo.Location;
 import resources.TestDataBuilder;
+import resources.Utils;
 
-public class StepDef {
+public class StepDef extends Utils{
 	RequestSpecification res;
 	ResponseSpecification resspec;
 	Response response;
 	TestDataBuilder data = new TestDataBuilder();
 	
 		@Given("Add place payload")
-		public void add_place_payload() {
-			RestAssured.baseURI = "https://rahulshettyacademy.com";
-
-			RequestSpecification req = new RequestSpecBuilder().setBaseUri("https://rahulshettyacademy.com")
-					.addQueryParam("key", "qaclick123").setContentType(ContentType.JSON).build();
-
-			 resspec = new ResponseSpecBuilder().expectStatusCode(200)
-					.expectContentType(ContentType.JSON).build();
-			res = given().spec(req).body(data.addPlacePayload());
+		public void add_place_payload() throws IOException {
+			 res = given().spec(RequestSpecification()).body(data.addPlacePayload());
 		}
 
 		@When("user called {string} using Post http call")
 		public void user_called_using_post_http_call(String string) {
+			resspec = new ResponseSpecBuilder().expectStatusCode(200)
+					.expectContentType(ContentType.JSON).build();
 			response = res.when().post("/maps/api/place/add/json").then().spec(resspec).extract().response();
+			
 			String responseString = response.asString();
 			System.out.println(responseString);
 		    
